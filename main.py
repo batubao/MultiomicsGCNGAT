@@ -23,7 +23,7 @@ data_3_tr_tensor, data_3_te_tensor = apply_pca(data_3_tr.values, data_3_te.value
 labels_tr_tensor = torch.tensor(labels_tr.values, dtype=torch.long).squeeze()
 labels_te_tensor = torch.tensor(labels_te.values, dtype=torch.long).squeeze()
 
-# Combine training and testing data for evaluation
+# preparation for evaluation
 combined_data_1 = torch.cat([data_1_tr_tensor, data_1_te_tensor], dim=0)
 combined_data_2 = torch.cat([data_2_tr_tensor, data_2_te_tensor], dim=0)
 combined_data_3 = torch.cat([data_3_tr_tensor, data_3_te_tensor], dim=0)
