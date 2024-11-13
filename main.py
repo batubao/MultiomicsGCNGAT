@@ -23,16 +23,40 @@ data_3_tr_tensor, data_3_te_tensor = apply_pca(data_3_tr.values, data_3_te.value
 labels_tr_tensor = torch.tensor(labels_tr.values, dtype=torch.long).squeeze()
 labels_te_tensor = torch.tensor(labels_te.values, dtype=torch.long).squeeze()
 
-# preparation for evaluation
+# Create edge indices based on cosine similarity for each modality
+edge_index_1 = create_edge_index_with_cosine_similarity(data_1_tr_tensor, threshold=0.5)
+edge_index_2 = create_edge_index_with_cosine_similarity(data_2_tr_tensor, threshold=0.5)
+edge_index_3 = create_edge_index_with_cosine_similarity(data_3_tr_tensor, threshold=0.5)
+
+# Construct Graph Data objects for each modality
+train_data_1 = Data(x=data_1_tr_tensor, edge_index=edge_index_1)
+train_data_2 = Data(x=data_2_tr_tensor, edge_index=edge_index_2)
+train_data_3 = Data(x=data_3_tr_tensor, edge_index=edge_index_3)
+
+# Similarly, create edge indices for test datasets
+edge_index_1_te = create_edge_index_with_cosine_similarity(data_1_te_tensor, threshold=0.5)
+edge_index_2_te = create_edge_index_with_cosine_similarity(data_2_te_tensor, threshold=0.5)
+edge_index_3_te = create_edge_index_with_cosine_similarity(data_3_te_tensor, threshold=0.5)
+
+test_data_1 = Data(x=data_1_te_tensor, edge_index=edge_index_1_te)
+test_data_2 = Data(x=data_2_te_tensor, edge_index=edge_index_2_te)
+test_data_3 = Data(x=data_3_te_tensor, edge_index=edge_index_3_te)
+
+# Combine training and testing data for testing phase
 combined_data_1 = torch.cat([data_1_tr_tensor, data_1_te_tensor], dim=0)
 combined_data_2 = torch.cat([data_2_tr_tensor, data_2_te_tensor], dim=0)
 combined_data_3 = torch.cat([data_3_tr_tensor, data_3_te_tensor], dim=0)
 combined_labels = torch.cat([labels_tr_tensor, labels_te_tensor], dim=0)
 
-# Create edge indices and Data objects
-combined_data_1 = Data(x=combined_data_1, edge_index=create_edge_index_with_cosine_similarity(combined_data_1))
-combined_data_2 = Data(x=combined_data_2, edge_index=create_edge_index_with_cosine_similarity(combined_data_2))
-combined_data_3 = Data(x=combined_data_3, edge_index=create_edge_index_with_cosine_similarity(combined_data_3))
+# Create edge indices for the combined dataset
+edge_index_combined_1 = create_edge_index_with_cosine_similarity(combined_data_1, threshold=0.5)
+edge_index_combined_2 = create_edge_index_with_cosine_similarity(combined_data_2, threshold=0.5)
+edge_index_combined_3 = create_edge_index_with_cosine_similarity(combined_data_3, threshold=0.5)
+
+combined_data_1 = Data(x=combined_data_1, edge_index=edge_index_combined_1)
+combined_data_2 = Data(x=combined_data_2, edge_index=edge_index_combined_2)
+combined_data_3 = Data(x=combined_data_3, edge_index=edge_index_combined_3)
+
 
 # Model parameters
 in_channels = data_1_tr_tensor.shape[1]
